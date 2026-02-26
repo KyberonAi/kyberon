@@ -20,7 +20,6 @@ import {
   ClipboardCheck,
   CheckCircle2,
   PlugZap,
-  Code2,
   Lock,
   Eye,
   Zap,
@@ -172,20 +171,6 @@ const faqs = [
 
 /* ─────────────── Shared Components ─────────────── */
 
-function Badge({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <span
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-1 text-xs font-medium text-zinc-400",
-        "dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-400",
-        "light:border-zinc-200 light:bg-zinc-100 light:text-zinc-600",
-        className
-      )}
-    >
-      {children}
-    </span>
-  );
-}
 
 function SectionLabel({ children }: { children: ReactNode }) {
   return (
