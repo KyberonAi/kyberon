@@ -843,7 +843,7 @@ function ProjectsSection({
         </AnimatePresence>
 
         {/* Two-column layout: cards left, code right */}
-        <div className="mt-12 grid gap-6 lg:grid-cols-2">
+        <div className="mt-12 grid items-start gap-6 lg:grid-cols-2">
           {/* Left: project cards stacked */}
           <div className="space-y-3">
             {projects.map((project, i) => {
