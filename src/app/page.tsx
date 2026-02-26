@@ -13,8 +13,6 @@ import {
   X,
   Github,
   BookOpen,
-  Sun,
-  Moon,
   AlertTriangle,
   BrainCircuit,
   ClipboardCheck,
@@ -29,10 +27,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type Theme = "dark" | "light";
 type ProjectId = "attesta" | "memproof" | "trailproof";
-
-const THEME_KEY = "kyberon-theme";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -183,22 +178,9 @@ function SectionLabel({ children }: { children: ReactNode }) {
   );
 }
 
-function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
-      aria-label="Toggle theme"
-    >
-      {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
-    </button>
-  );
-}
-
 /* ─────────────── Navbar ─────────────── */
 
-function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
+function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const links = [
@@ -219,7 +201,7 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
         scrolled
-          ? "border-b border-zinc-200 bg-white/80 backdrop-blur-xl dark:border-zinc-800/50 dark:bg-zinc-950/80"
+          ? "border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-xl"
           : "bg-transparent"
       )}
     >
@@ -236,7 +218,7 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
               />
             </svg>
           </div>
-          <span className="text-sm font-semibold text-zinc-900 dark:text-white">
+          <span className="text-sm font-semibold text-white">
             KyberonAI
           </span>
         </a>
@@ -246,7 +228,7 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
             <li key={link.label}>
               <a
                 href={link.href}
-                className="rounded-md px-3 py-1.5 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
+                className="rounded-md px-3 py-1.5 text-sm text-zinc-400 transition hover:text-white"
               >
                 {link.label}
               </a>
@@ -255,12 +237,11 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
         </ul>
 
         <div className="hidden items-center gap-2 md:flex">
-          <ThemeToggle theme={theme} onToggle={onToggle} />
           <a
             href="https://github.com/orgs/KyberonAi/repositories"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+            className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900 transition hover:bg-zinc-100"
           >
             <Github className="h-3.5 w-3.5" />
             GitHub
@@ -268,7 +249,7 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
         </div>
 
         <button
-          className="p-2 text-zinc-600 dark:text-zinc-400 md:hidden"
+          className="p-2 text-zinc-400 md:hidden"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
         >
@@ -282,7 +263,7 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-zinc-200 dark:border-zinc-800 md:hidden"
+            className="overflow-hidden border-t border-zinc-800 md:hidden"
           >
             <ul className="space-y-1 p-4">
               {links.map((link) => (
@@ -290,20 +271,19 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
                   <a
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="block rounded-lg px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800/50"
+                    className="block rounded-lg px-3 py-2 text-sm text-zinc-400 hover:bg-zinc-800/50"
                   >
                     {link.label}
                   </a>
                 </li>
               ))}
               <li className="flex items-center gap-2 pt-3">
-                <ThemeToggle theme={theme} onToggle={onToggle} />
                 <a
                   href="https://github.com/orgs/KyberonAi/repositories"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setOpen(false)}
-                  className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-zinc-900"
+                  className="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-zinc-900"
                 >
                   <Github className="h-3.5 w-3.5" />
                   GitHub
@@ -331,17 +311,17 @@ function HeroSection() {
         <motion.h1
           variants={fadeUp}
           custom={0}
-          className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-6xl lg:text-7xl dark:text-white"
+          className="text-4xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl"
         >
           Open source software
           <br />
-          <span className="text-zinc-400 dark:text-zinc-500">for AI agents</span>
+          <span className="text-zinc-500">for AI agents</span>
         </motion.h1>
 
         <motion.p
           variants={fadeUp}
           custom={1}
-          className="mx-auto mt-6 max-w-2xl text-base text-zinc-600 sm:text-lg dark:text-zinc-400"
+          className="mx-auto mt-6 max-w-2xl text-base text-zinc-400 sm:text-lg"
         >
           Trust actions. Trust memory. KyberonAI gives teams focused
           reliability layers for production agent systems.
@@ -363,7 +343,7 @@ function HeroSection() {
             href="https://github.com/orgs/KyberonAi/repositories"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-6 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-6 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800"
           >
             <Github className="h-4 w-4" />
             View on GitHub
@@ -426,14 +406,14 @@ const transfer = engine.guard({ risk: "high" },
 
   return (
     <div className="code-block mx-auto max-w-2xl overflow-hidden rounded-xl text-left">
-      <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5 dark:border-zinc-800">
+      <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5">
         <div className="flex items-center gap-1">
           <button
             onClick={() => setTab("python")}
             className={cn(
               "rounded-md px-2.5 py-1 text-xs font-medium transition",
               tab === "python"
-                ? "bg-zinc-800 text-white dark:bg-zinc-700"
+                ? "bg-zinc-700 text-white"
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           >
@@ -444,7 +424,7 @@ const transfer = engine.guard({ risk: "high" },
             className={cn(
               "rounded-md px-2.5 py-1 text-xs font-medium transition",
               tab === "typescript"
-                ? "bg-zinc-800 text-white dark:bg-zinc-700"
+                ? "bg-zinc-700 text-white"
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           >
@@ -460,7 +440,7 @@ const transfer = engine.guard({ risk: "high" },
         </button>
       </div>
       <pre className="overflow-x-auto p-4 text-[13px] leading-relaxed">
-        <code className="text-zinc-300 dark:text-zinc-300">
+        <code className="text-zinc-300">
           {code.split("\n").map((line, i) => (
             <div key={i} className="flex">
               <span className="mr-4 inline-block w-6 select-none text-right text-zinc-600">
@@ -583,10 +563,10 @@ function StatsSection() {
               custom={i}
               className="text-center"
             >
-              <div className="text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white">
+              <div className="text-3xl font-bold text-white sm:text-4xl">
                 {stat.value}
               </div>
-              <div className="mt-1 text-sm text-zinc-500 dark:text-zinc-500">
+              <div className="mt-1 text-sm text-zinc-500">
                 {stat.label}
               </div>
             </motion.div>
@@ -781,7 +761,7 @@ function ProjectCodeWindow({ projectId }: { projectId: ProjectId }) {
             className={cn(
               "rounded-md px-2.5 py-1 text-xs font-medium transition",
               lang === "python"
-                ? "bg-zinc-800 text-white dark:bg-zinc-700"
+                ? "bg-zinc-700 text-white"
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           >
@@ -792,7 +772,7 @@ function ProjectCodeWindow({ projectId }: { projectId: ProjectId }) {
             className={cn(
               "rounded-md px-2.5 py-1 text-xs font-medium transition",
               lang === "typescript"
-                ? "bg-zinc-800 text-white dark:bg-zinc-700"
+                ? "bg-zinc-700 text-white"
                 : "text-zinc-500 hover:text-zinc-300"
             )}
           >
@@ -853,10 +833,10 @@ function ProjectsSection({
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
           >
-            <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white">
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
               {selected.name}
             </h2>
-            <p className="mt-3 max-w-xl text-base text-zinc-500 dark:text-zinc-400">
+            <p className="mt-3 max-w-xl text-base text-zinc-400">
               {selected.summary}
             </p>
           </motion.div>
@@ -900,7 +880,7 @@ function ProjectsSection({
                           <project.icon className={cn("h-3.5 w-3.5", colors.text)} />
                         )}
                       </div>
-                      <span className="text-sm font-semibold text-zinc-900 dark:text-white">
+                      <span className="text-sm font-semibold text-white">
                         {project.name}
                       </span>
                     </div>
@@ -916,7 +896,7 @@ function ProjectsSection({
                     </span>
                   </div>
 
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">
                     {project.tagline}
                   </p>
 
@@ -934,7 +914,7 @@ function ProjectsSection({
                           {project.badges.map((badge) => (
                             <span
                               key={badge}
-                              className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] font-medium text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-500"
+                              className="rounded-md border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[11px] font-medium text-zinc-500"
                             >
                               {badge}
                             </span>
@@ -943,7 +923,7 @@ function ProjectsSection({
                         <div className="mt-3 flex gap-2">
                           <a
                             href={project.docsHref}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-zinc-800"
                             onClick={(e) => e.stopPropagation()}
                           >
                             <BookOpen className="h-3 w-3" />
@@ -1091,7 +1071,7 @@ function HowItWorksSection() {
           <motion.h2
             variants={fadeUp}
             custom={0}
-            className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white"
+            className="text-3xl font-bold tracking-tight text-white sm:text-4xl"
           >
             Designed around real
             <br />
@@ -1100,7 +1080,7 @@ function HowItWorksSection() {
           <motion.p
             variants={fadeUp}
             custom={1}
-            className="mt-4 max-w-xl text-base text-zinc-500 dark:text-zinc-400"
+            className="mt-4 max-w-xl text-base text-zinc-400"
           >
             Kyberon prioritizes high-impact failure patterns that teams hit when agents move from demo to production.
           </motion.p>
@@ -1120,8 +1100,8 @@ function HowItWorksSection() {
               <div className={cn("mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg", item.iconBg)}>
                 <item.icon className={cn("h-5 w-5", item.iconColor)} />
               </div>
-              <h3 className="text-base font-semibold text-zinc-900 dark:text-white">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{item.desc}</p>
+              <h3 className="text-base font-semibold text-white">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-400">{item.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -1141,10 +1121,10 @@ function HowItWorksSection() {
               viewport={{ once: true }}
               variants={fadeUp}
               custom={i}
-              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/30"
+              className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-900/30 px-4 py-3"
             >
               <feat.icon className="h-4 w-4 text-blue-500" />
-              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{feat.label}</span>
+              <span className="text-sm font-medium text-zinc-300">{feat.label}</span>
             </motion.div>
           ))}
         </div>
@@ -1169,7 +1149,7 @@ function IntegrationsSection() {
           <motion.h2
             variants={fadeUp}
             custom={0}
-            className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white"
+            className="text-3xl font-bold tracking-tight text-white sm:text-4xl"
           >
             Plugs into your
             <br />
@@ -1178,7 +1158,7 @@ function IntegrationsSection() {
           <motion.p
             variants={fadeUp}
             custom={1}
-            className="mt-4 max-w-xl text-base text-zinc-500 dark:text-zinc-400"
+            className="mt-4 max-w-xl text-base text-zinc-400"
           >
             Use Kyberon with the frameworks and workflow tools your team already runs.
           </motion.p>
@@ -1203,7 +1183,7 @@ function IntegrationsSection() {
                 {group.items.map((item) => (
                   <span
                     key={item}
-                    className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-400"
+                    className="rounded-md border border-zinc-800 bg-zinc-900/50 px-3 py-1.5 text-xs font-medium text-zinc-400"
                   >
                     {item}
                   </span>
@@ -1232,7 +1212,7 @@ function FAQSection() {
           viewport={{ once: true }}
           variants={fadeUp}
           custom={0}
-          className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white"
+          className="text-3xl font-bold tracking-tight text-white sm:text-4xl"
         >
           Frequently asked
           <br />
@@ -1255,7 +1235,7 @@ function FAQSection() {
             >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-medium text-zinc-800 transition hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white"
+                className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-medium text-zinc-200 transition hover:text-white"
               >
                 {faq.q}
                 <ChevronDown
@@ -1274,7 +1254,7 @@ function FAQSection() {
                     transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <p className="px-5 pb-4 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+                    <p className="px-5 pb-4 text-sm leading-relaxed text-zinc-400">
                       {faq.a}
                     </p>
                   </motion.div>
@@ -1299,7 +1279,7 @@ function CTABanner() {
           whileInView="visible"
           viewport={{ once: true }}
           variants={stagger}
-          className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 p-12 text-center dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-16"
+          className="relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/50 p-12 text-center sm:p-16"
         >
           <div
             className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-violet-500/5"
@@ -1309,7 +1289,7 @@ function CTABanner() {
           <motion.h2
             variants={fadeUp}
             custom={0}
-            className="relative text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white"
+            className="relative text-3xl font-bold tracking-tight text-white sm:text-4xl"
           >
             Build trusted agents
             <br />
@@ -1318,7 +1298,7 @@ function CTABanner() {
           <motion.p
             variants={fadeUp}
             custom={1}
-            className="relative mx-auto mt-4 max-w-lg text-zinc-500 dark:text-zinc-400"
+            className="relative mx-auto mt-4 max-w-lg text-zinc-400"
           >
             Adopt Attesta, MemProof, or TrailProof today and help shape the
             reliability layer for autonomous AI systems.
@@ -1340,7 +1320,7 @@ function CTABanner() {
             </a>
             <a
               href="#projects"
-              className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-6 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-6 py-2.5 text-sm font-medium text-zinc-300 transition hover:bg-zinc-800"
             >
               View Projects
             </a>
@@ -1382,7 +1362,7 @@ function Footer() {
   ];
 
   return (
-    <footer className="border-t border-zinc-200 py-12 dark:border-zinc-800/50">
+    <footer className="border-t border-zinc-800/50 py-12">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           <div>
@@ -1398,19 +1378,19 @@ function Footer() {
                   />
                 </svg>
               </div>
-              <span className="text-sm font-semibold text-zinc-900 dark:text-white">KyberonAI</span>
+              <span className="text-sm font-semibold text-white">KyberonAI</span>
             </a>
             <p className="mt-3 text-xs text-zinc-500">
               Open-source reliability infrastructure
               <br />
               for AI agents.
             </p>
-            <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-600">MIT Licensed</p>
+            <p className="mt-2 text-xs text-zinc-600">MIT Licensed</p>
           </div>
 
           {cols.map((col) => (
             <div key={col.title}>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-500">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500">
                 {col.title}
               </h4>
               <ul className="mt-3 space-y-2">
@@ -1418,7 +1398,7 @@ function Footer() {
                   <li key={link.label}>
                     <a
                       href={link.href}
-                      className="text-sm text-zinc-500 transition hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-300"
+                      className="text-sm text-zinc-500 transition hover:text-zinc-300"
                     >
                       {link.label}
                     </a>
@@ -1429,8 +1409,8 @@ function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-zinc-200 pt-8 dark:border-zinc-800/50 sm:flex-row">
-          <p className="text-xs text-zinc-400 dark:text-zinc-600">
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-zinc-800/50 pt-8 sm:flex-row">
+          <p className="text-xs text-zinc-600">
             &copy; {new Date().getFullYear()} KyberonAI. Open source under MIT.
           </p>
           <div className="flex gap-5">
@@ -1438,7 +1418,7 @@ function Footer() {
               <a
                 key={s}
                 href="#"
-                className="text-xs text-zinc-400 transition hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-400"
+                className="text-xs text-zinc-600 transition hover:text-zinc-400"
               >
                 {s}
               </a>
@@ -1452,36 +1432,12 @@ function Footer() {
 
 /* ─────────────── Main ─────────────── */
 
-function applyTheme(theme: Theme) {
-  const root = document.documentElement;
-  root.classList.remove("light", "dark");
-  root.classList.add(theme);
-}
-
 export default function Home() {
-  const [theme, setTheme] = useState<Theme>("dark");
   const [activeProject, setActiveProject] = useState<ProjectId>("attesta");
-
-  useEffect(() => {
-    const stored = window.localStorage.getItem(THEME_KEY);
-    if (stored === "light" || stored === "dark") {
-      setTheme(stored);
-      return;
-    }
-    setTheme("dark");
-  }, []);
-
-  useEffect(() => {
-    applyTheme(theme);
-    window.localStorage.setItem(THEME_KEY, theme);
-  }, [theme]);
 
   return (
     <>
-      <Navbar
-        theme={theme}
-        onToggle={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
-      />
+      <Navbar />
       <main>
         <HeroSection />
         <div className="section-divider" />

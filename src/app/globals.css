@@ -2,8 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root,
-html.dark {
+:root {
   --background: #09090b;
   --foreground: #fafafa;
   --muted: #a1a1aa;
@@ -13,18 +12,7 @@ html.dark {
   --card-border: rgba(255, 255, 255, 0.06);
   --accent: #3b82f6;
   --accent-muted: rgba(59, 130, 246, 0.15);
-}
-
-html.light {
-  --background: #fafafa;
-  --foreground: #09090b;
-  --muted: #71717a;
-  --dot-color: rgba(0, 0, 0, 0.06);
-  --card-bg: rgba(255, 255, 255, 0.8);
-  --card-hover: rgba(255, 255, 255, 0.95);
-  --card-border: rgba(0, 0, 0, 0.08);
-  --accent: #2563eb;
-  --accent-muted: rgba(37, 99, 235, 0.1);
+  color-scheme: dark;
 }
 
 * {
@@ -78,12 +66,7 @@ body {
 .code-block {
   background: #0c0c0e;
   border: 1px solid rgba(255, 255, 255, 0.06);
-  font-family: var(--font-geist-mono), 'Geist Mono', monospace;
-}
-
-html.light .code-block {
-  background: #1a1a1e;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-family: var(--font-jetbrains-mono), 'JetBrains Mono', monospace;
 }
 
 /* Section divider */
