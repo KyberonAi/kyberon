@@ -9,15 +9,10 @@ import {
   MemoryStick,
   ArrowRight,
   ChevronDown,
-  Sparkles,
-  Star,
   Menu,
   X,
   Github,
   BookOpen,
-  Heart,
-  Users,
-  GitFork,
   Sun,
   Moon,
   AlertTriangle,
@@ -25,6 +20,13 @@ import {
   ClipboardCheck,
   CheckCircle2,
   PlugZap,
+  Code2,
+  Lock,
+  Eye,
+  Zap,
+  Terminal,
+  Copy,
+  Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,13 +36,13 @@ type ProjectId = "attesta" | "memproof" | "trailproof";
 const THEME_KEY = "kyberon-theme";
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 26 },
+  hidden: { opacity: 0, y: 20 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
     transition: {
-      delay: i * 0.08,
-      duration: 0.55,
+      delay: i * 0.1,
+      duration: 0.5,
       ease: [0.25, 0.46, 0.45, 0.94] as [number, number, number, number],
     },
   }),
@@ -49,7 +51,7 @@ const fadeUp = {
 const stagger = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.08 },
+    transition: { staggerChildren: 0.1 },
   },
 };
 
@@ -151,7 +153,7 @@ const integrationGroups = [
 
 const faqs = [
   {
-    q: "Are both projects open source?",
+    q: "Are all projects open source?",
     a: "Yes. Attesta, MemProof, and TrailProof are open-source projects built for self-hosted and community-driven adoption.",
   },
   {
@@ -168,50 +170,31 @@ const faqs = [
   },
 ];
 
-function SectionBadge({ children }: { children: ReactNode }) {
+/* ─────────────── Shared Components ─────────────── */
+
+function Badge({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-slate-400/20 bg-white/5 px-4 py-1.5 text-xs font-medium tracking-wider uppercase text-cyan-300 backdrop-blur">
-      <Sparkles className="h-3 w-3" />
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border border-zinc-800 bg-zinc-900/50 px-3 py-1 text-xs font-medium text-zinc-400",
+        "dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-400",
+        "light:border-zinc-200 light:bg-zinc-100 light:text-zinc-600",
+        className
+      )}
+    >
       {children}
     </span>
   );
 }
 
-function SectionHeading({
-  badge,
-  title,
-  subtitle,
-}: {
-  badge: string;
-  title: string;
-  subtitle: string;
-}) {
+function SectionLabel({ children }: { children: ReactNode }) {
   return (
-    <motion.div
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: "-100px" }}
-      variants={stagger}
-      className="mx-auto mb-14 max-w-3xl text-center"
-    >
-      <motion.div variants={fadeUp} custom={0}>
-        <SectionBadge>{badge}</SectionBadge>
-      </motion.div>
-      <motion.h2
-        variants={fadeUp}
-        custom={1}
-        className="mt-4 text-3xl font-bold tracking-tight sm:text-4xl lg:text-5xl"
-      >
-        {title}
-      </motion.h2>
-      <motion.p
-        variants={fadeUp}
-        custom={2}
-        className="mt-4 text-base text-slate-500 dark:text-slate-400 sm:text-lg"
-      >
-        {subtitle}
-      </motion.p>
-    </motion.div>
+    <div className="mb-4 flex items-center gap-2">
+      <div className="h-px w-8 bg-blue-500/50" />
+      <span className="text-xs font-semibold uppercase tracking-widest text-blue-500">
+        {children}
+      </span>
+    </div>
   );
 }
 
@@ -220,40 +203,45 @@ function ThemeToggle({ theme, onToggle }: { theme: Theme; onToggle: () => void }
     <button
       type="button"
       onClick={onToggle}
-      className="inline-flex items-center gap-2 rounded-full border border-slate-400/20 bg-white/70 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:border-sky-400/40 hover:text-sky-600 dark:bg-white/5 dark:text-slate-300 dark:hover:text-sky-300"
+      className="flex h-8 w-8 items-center justify-center rounded-lg border border-zinc-200 bg-white text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800"
       aria-label="Toggle theme"
-      title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
     >
-      {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-      <span>{theme === "dark" ? "Light" : "Dark"}</span>
+      {theme === "dark" ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
     </button>
   );
 }
 
+/* ─────────────── Navbar ─────────────── */
+
 function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const links = [
     { label: "Projects", href: "#projects" },
-    { label: "Failure Modes", href: "#failure-modes" },
+    { label: "How it works", href: "#how-it-works" },
     { label: "Integrations", href: "#integrations" },
     { label: "FAQ", href: "#faq" },
   ];
 
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <nav
-      className="fixed inset-x-0 top-0 z-50 border-b border-slate-300/40 bg-white/75 backdrop-blur-xl dark:border-white/[0.06] dark:bg-[#030712]/70"
-      role="navigation"
-      aria-label="Main navigation"
+      className={cn(
+        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
+        scrolled
+          ? "border-b border-zinc-200 bg-white/80 backdrop-blur-xl dark:border-zinc-800/50 dark:bg-zinc-950/80"
+          : "bg-transparent"
+      )}
     >
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <a href="#" className="flex items-center gap-2 text-base font-bold tracking-tight">
-          <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 text-white">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              className="h-4 w-4"
-              aria-hidden="true"
-            >
+      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4 sm:px-6">
+        <a href="#" className="flex items-center gap-2.5">
+          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-600">
+            <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4 text-white" aria-hidden="true">
               <path
                 d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
                 stroke="currentColor"
@@ -263,17 +251,17 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
               />
             </svg>
           </div>
-          <span className="text-slate-900 dark:text-white">
-            Kyberon<span className="text-blue-500 dark:text-blue-400">AI</span>
+          <span className="text-sm font-semibold text-zinc-900 dark:text-white">
+            KyberonAI
           </span>
         </a>
 
-        <ul className="hidden items-center gap-6 lg:flex">
+        <ul className="hidden items-center gap-1 lg:flex">
           {links.map((link) => (
             <li key={link.label}>
               <a
                 href={link.href}
-                className="text-sm text-slate-600 transition hover:text-slate-900 dark:text-slate-400 dark:hover:text-white"
+                className="rounded-md px-3 py-1.5 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white"
               >
                 {link.label}
               </a>
@@ -281,24 +269,23 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
           ))}
         </ul>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle theme={theme} onToggle={onToggle} />
           <a
             href="https://github.com/orgs/KyberonAi/repositories"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 px-5 py-2 text-sm font-medium text-white transition hover:brightness-110"
+            className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
           >
-            <Github className="h-4 w-4" />
-            Star on GitHub
+            <Github className="h-3.5 w-3.5" />
+            GitHub
           </a>
         </div>
 
         <button
-          className="p-2 text-slate-600 dark:text-slate-400 md:hidden"
+          className="p-2 text-zinc-600 dark:text-zinc-400 md:hidden"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
-          aria-expanded={open}
         >
           {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
         </button>
@@ -310,34 +297,32 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-slate-300/40 dark:border-white/10 md:hidden"
+            className="overflow-hidden border-t border-zinc-200 dark:border-zinc-800 md:hidden"
           >
-            <ul className="space-y-1 px-4 py-4">
+            <ul className="space-y-1 p-4">
               {links.map((link) => (
                 <li key={link.label}>
                   <a
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className="block rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/5 dark:hover:text-white"
+                    className="block rounded-lg px-3 py-2 text-sm text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800/50"
                   >
                     {link.label}
                   </a>
                 </li>
               ))}
-              <li className="pt-2">
-                <div className="flex items-center justify-between gap-3 px-1">
-                  <ThemeToggle theme={theme} onToggle={onToggle} />
-                  <a
-                    href="https://github.com/orgs/KyberonAi/repositories"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => setOpen(false)}
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-2 text-sm font-medium text-white"
-                  >
-                    <Github className="h-4 w-4" />
-                    Star
-                  </a>
-                </div>
+              <li className="flex items-center gap-2 pt-3">
+                <ThemeToggle theme={theme} onToggle={onToggle} />
+                <a
+                  href="https://github.com/orgs/KyberonAi/repositories"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setOpen(false)}
+                  className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white dark:bg-white dark:text-zinc-900"
+                >
+                  <Github className="h-3.5 w-3.5" />
+                  GitHub
+                </a>
               </li>
             </ul>
           </motion.div>
@@ -347,129 +332,514 @@ function Navbar({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
   );
 }
 
+/* ─────────────── Hero ─────────────── */
+
 function HeroSection() {
   return (
-    <section className="relative flex min-h-[92vh] flex-col items-center justify-center px-4 pt-24 text-center">
-      <div
-        className="pointer-events-none absolute -top-40 left-1/2 h-[620px] w-[900px] -translate-x-1/2 rounded-full bg-gradient-radial from-blue-500/20 via-cyan-500/10 to-transparent blur-3xl"
-        aria-hidden="true"
-      />
-
+    <section className="relative flex min-h-[90vh] flex-col items-center justify-center px-4 pt-20">
       <motion.div
         initial="hidden"
         animate="visible"
         variants={stagger}
-        className="relative z-10 mx-auto max-w-5xl"
+        className="relative z-10 mx-auto max-w-4xl text-center"
       >
-        <motion.div variants={fadeUp} custom={0} className="mb-6">
-          <span className="inline-flex items-center gap-2 rounded-full border border-slate-400/20 bg-white/60 px-4 py-1.5 text-xs font-medium tracking-wider uppercase text-blue-600 backdrop-blur dark:bg-white/[0.03] dark:text-blue-300">
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-            </span>
-            Open Source Ecosystem
-          </span>
-        </motion.div>
-
         <motion.h1
           variants={fadeUp}
-          custom={1}
-          className="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-6xl lg:text-7xl dark:text-white"
+          custom={0}
+          className="text-4xl font-bold tracking-tight text-zinc-900 sm:text-6xl lg:text-7xl dark:text-white"
         >
-          Open Source Software for{" "}
-          <span className="bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-700 bg-clip-text text-transparent dark:from-blue-400 dark:via-cyan-300 dark:to-purple-400">
-            Autonomous AI Agents
-          </span>
+          Open source software
+          <br />
+          <span className="text-zinc-400 dark:text-zinc-500">for AI agents</span>
         </motion.h1>
 
         <motion.p
           variants={fadeUp}
-          custom={2}
-          className="mx-auto mt-6 max-w-3xl text-lg text-slate-600 sm:text-xl dark:text-slate-400"
+          custom={1}
+          className="mx-auto mt-6 max-w-2xl text-base text-zinc-600 sm:text-lg dark:text-zinc-400"
         >
-          Trust actions. Trust memory. KyberonAI gives teams focused reliability
-          layers for production agent systems.
+          Trust actions. Trust memory. KyberonAI gives teams focused
+          reliability layers for production agent systems.
         </motion.p>
 
         <motion.div
           variants={fadeUp}
-          custom={3}
-          className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
+          custom={2}
+          className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
         >
           <a
             href="#projects"
-            className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 px-8 py-3.5 text-sm font-semibold text-white transition hover:brightness-110"
+            className="group inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
           >
             Explore Projects
-            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+            <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
           </a>
           <a
-            href="#integrations"
-            className="inline-flex items-center gap-2 rounded-full border border-slate-400/25 bg-white/70 px-8 py-3.5 text-sm font-semibold text-slate-700 backdrop-blur transition hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-300 dark:hover:bg-white/[0.06]"
+            href="https://github.com/orgs/KyberonAi/repositories"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-6 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
           >
-            <BookOpen className="h-4 w-4" />
-            Integrations
+            <Github className="h-4 w-4" />
+            View on GitHub
           </a>
         </motion.div>
 
-        <motion.div variants={fadeUp} custom={4} className="mt-14">
-          <div className="hero-flow rounded-2xl p-5 sm:p-6">
-            <div className="hero-flow-rail" aria-hidden="true">
-              <div className="hero-flow-dot" />
-            </div>
-            <div className="grid gap-3 sm:grid-cols-4">
-              {["Agent Action", "Policy Check", "Human Verify", "Memory Guard"].map((item) => (
-                <div
-                  key={item}
-                  className="hero-flow-node rounded-lg px-3 py-2 text-xs font-semibold tracking-wide"
-                >
-                  {item}
-                </div>
-              ))}
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          variants={fadeUp}
-          custom={5}
-          className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-4 opacity-75"
-        >
-          {[
-            { icon: Star, label: "MIT" },
-            { icon: GitFork, label: "Fork Friendly" },
-            { icon: Users, label: "Community Driven" },
-            { icon: Heart, label: "Built in Public" },
-          ].map((badge) => (
-            <span
-              key={badge.label}
-              className="flex items-center gap-1.5 text-xs font-medium tracking-widest uppercase text-slate-500"
-            >
-              <badge.icon className="h-3.5 w-3.5" />
-              {badge.label}
-            </span>
-          ))}
-        </motion.div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-      >
-        <motion.div
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-          className="flex flex-col items-center gap-2 text-slate-500"
-        >
-          <span className="text-xs tracking-widest uppercase">Scroll</span>
-          <ChevronDown className="h-4 w-4" />
+        {/* Code Preview */}
+        <motion.div variants={fadeUp} custom={3} className="mt-16">
+          <CodePreview />
         </motion.div>
       </motion.div>
     </section>
   );
 }
+
+/* ─────────────── Code Preview ─────────────── */
+
+function CodePreview() {
+  const [copied, setCopied] = useState(false);
+  const [tab, setTab] = useState<"python" | "typescript">("python");
+
+  const pythonCode = `from attesta import PolicyEngine, Challenge
+
+engine = PolicyEngine()
+
+@engine.guard(risk="high")
+async def transfer_funds(agent, amount, to):
+    challenge = await Challenge.create(
+        action="transfer_funds",
+        context={"amount": amount, "to": to}
+    )
+    approval = await challenge.request_human_review()
+    if approval.granted:
+        return await agent.execute(amount, to)`;
+
+  const tsCode = `import { PolicyEngine, Challenge } from "@kyberon/attesta";
+
+const engine = new PolicyEngine();
+
+const transfer = engine.guard({ risk: "high" },
+  async (agent, amount: number, to: string) => {
+    const challenge = await Challenge.create({
+      action: "transfer_funds",
+      context: { amount, to }
+    });
+    const approval = await challenge.requestHumanReview();
+    if (approval.granted) {
+      return agent.execute(amount, to);
+    }
+  }
+);`;
+
+  const code = tab === "python" ? pythonCode : tsCode;
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="code-block mx-auto max-w-2xl overflow-hidden rounded-xl text-left">
+      <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5 dark:border-zinc-800">
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setTab("python")}
+            className={cn(
+              "rounded-md px-2.5 py-1 text-xs font-medium transition",
+              tab === "python"
+                ? "bg-zinc-800 text-white dark:bg-zinc-700"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            Python
+          </button>
+          <button
+            onClick={() => setTab("typescript")}
+            className={cn(
+              "rounded-md px-2.5 py-1 text-xs font-medium transition",
+              tab === "typescript"
+                ? "bg-zinc-800 text-white dark:bg-zinc-700"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            TypeScript
+          </button>
+        </div>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-zinc-500 transition hover:text-zinc-300"
+        >
+          {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+      <pre className="overflow-x-auto p-4 text-[13px] leading-relaxed">
+        <code className="text-zinc-300 dark:text-zinc-300">
+          {code.split("\n").map((line, i) => (
+            <div key={i} className="flex">
+              <span className="mr-4 inline-block w-6 select-none text-right text-zinc-600">
+                {i + 1}
+              </span>
+              <span>
+                {highlightLine(line)}
+              </span>
+            </div>
+          ))}
+        </code>
+      </pre>
+    </div>
+  );
+}
+
+function highlightLine(line: string) {
+  // Comment lines
+  const trimmed = line.trimStart();
+  if (trimmed.startsWith("#") || trimmed.startsWith("//")) {
+    const indent = line.slice(0, line.length - trimmed.length);
+    return (
+      <>
+        {indent}
+        <span className="text-zinc-500 italic">{trimmed}</span>
+      </>
+    );
+  }
+
+  // Tokenize and colorize
+  const tokens: { text: string; color: string }[] = [];
+  // Regex to match keywords, decorators, strings, function calls, numbers, types, and the rest
+  const regex =
+    /(@\w[\w.]*)|("(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')|\b(from|import|async|await|def|if|return|const|let|new|class|export|throw|function)\b|\b(True|False|true|false|None|null|undefined)\b|\b(string|number|boolean|object|any|void|Promise)\b|\b([A-Z]\w*)\b|(\.\w+)\(|\b(\d+\.?\d*)\b/g;
+
+  let lastIndex = 0;
+  let match;
+
+  while ((match = regex.exec(line)) !== null) {
+    // Add plain text before match
+    if (match.index > lastIndex) {
+      tokens.push({ text: line.slice(lastIndex, match.index), color: "" });
+    }
+
+    if (match[1]) {
+      // Decorator (@something)
+      tokens.push({ text: match[1], color: "text-yellow-300" });
+    } else if (match[2]) {
+      // String
+      tokens.push({ text: match[2], color: "text-amber-300" });
+    } else if (match[3]) {
+      // Keyword
+      tokens.push({ text: match[3], color: "text-purple-400" });
+    } else if (match[4]) {
+      // Boolean/None/null
+      tokens.push({ text: match[4], color: "text-orange-400" });
+    } else if (match[5]) {
+      // Type annotation
+      tokens.push({ text: match[5], color: "text-cyan-300" });
+    } else if (match[6]) {
+      // Class name (PascalCase)
+      tokens.push({ text: match[6], color: "text-teal-300" });
+    } else if (match[7]) {
+      // Method call (.methodName followed by open paren)
+      tokens.push({ text: match[7], color: "text-sky-300" });
+      tokens.push({ text: "(", color: "" });
+    } else if (match[8]) {
+      // Number
+      tokens.push({ text: match[8], color: "text-orange-300" });
+    }
+
+    lastIndex = regex.lastIndex;
+  }
+
+  // Remaining text
+  if (lastIndex < line.length) {
+    tokens.push({ text: line.slice(lastIndex), color: "" });
+  }
+
+  if (tokens.length === 0) {
+    return <>{line}</>;
+  }
+
+  return (
+    <>
+      {tokens.map((t, i) =>
+        t.color ? (
+          <span key={i} className={t.color}>
+            {t.text}
+          </span>
+        ) : (
+          <span key={i}>{t.text}</span>
+        )
+      )}
+    </>
+  );
+}
+
+/* ─────────────── Stats ─────────────── */
+
+function StatsSection() {
+  const stats = [
+    { value: "3", label: "Open source projects" },
+    { value: "MIT", label: "Licensed" },
+    { value: "14+", label: "Integrations" },
+    { value: "100%", label: "Self-hostable" },
+  ];
+
+  return (
+    <section className="py-20">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={i}
+              className="text-center"
+            >
+              <div className="text-3xl font-bold text-zinc-900 sm:text-4xl dark:text-white">
+                {stat.value}
+              </div>
+              <div className="mt-1 text-sm text-zinc-500 dark:text-zinc-500">
+                {stat.label}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────── Project Code Snippets ─────────────── */
+
+const projectCodeSnippets: Record<
+  ProjectId,
+  { python: { filename: string; code: string }; typescript: { filename: string; code: string } }
+> = {
+  attesta: {
+    python: {
+      filename: "guard.py",
+      code: `from attesta import PolicyEngine, Challenge
+
+engine = PolicyEngine()
+
+@engine.guard(risk="high")
+async def transfer_funds(agent, amount, to):
+    challenge = await Challenge.create(
+        action="transfer_funds",
+        context={"amount": amount, "to": to}
+    )
+    approval = await challenge.request_human_review()
+    if approval.granted:
+        return await agent.execute(amount, to)`,
+    },
+    typescript: {
+      filename: "guard.ts",
+      code: `import { PolicyEngine, Challenge } from "@kyberon/attesta";
+
+const engine = new PolicyEngine();
+
+const transferFunds = engine.guard({ risk: "high" },
+  async (agent, amount: number, to: string) => {
+    const challenge = await Challenge.create({
+      action: "transfer_funds",
+      context: { amount, to }
+    });
+    const approval = await challenge.requestHumanReview();
+    if (approval.granted) {
+      return agent.execute(amount, to);
+    }
+  }
+);`,
+    },
+  },
+  memproof: {
+    python: {
+      filename: "memory.py",
+      code: `from memproof import MemoryGuard, Policy
+
+guard = MemoryGuard(
+    policy=Policy(
+        max_staleness="24h",
+        require_source=True,
+        conflict_strategy="reject"
+    )
+)
+
+@guard.validate_write
+async def store_context(key, value, source):
+    quality = await guard.check_quality(value)
+    if quality.score < 0.7:
+        raise guard.RejectWrite("Low quality")
+    return await guard.commit(key, value, source)
+
+@guard.validate_read
+async def recall(key, recency="7d"):
+    return await guard.retrieve(
+        key, max_age=recency, verify=True
+    )`,
+    },
+    typescript: {
+      filename: "memory.ts",
+      code: `import { MemoryGuard, Policy } from "@kyberon/memproof";
+
+const guard = new MemoryGuard({
+  policy: new Policy({
+    maxStaleness: "24h",
+    requireSource: true,
+    conflictStrategy: "reject"
+  })
+});
+
+const storeContext = guard.validateWrite(
+  async (key: string, value: any, source: string) => {
+    const quality = await guard.checkQuality(value);
+    if (quality.score < 0.7) {
+      throw new guard.RejectWrite("Low quality");
+    }
+    return guard.commit(key, value, source);
+  }
+);
+
+const recall = guard.validateRead(
+  async (key: string, recency = "7d") => {
+    return guard.retrieve(key, {
+      maxAge: recency, verify: true
+    });
+  }
+);`,
+    },
+  },
+  trailproof: {
+    python: {
+      filename: "audit.py",
+      code: `from trailproof import AuditTrail, Event
+
+trail = AuditTrail(
+    signing_key="sk_...",
+    chain=True  # cryptographic hash chain
+)
+
+@trail.track
+async def agent_action(action, context):
+    event = Event.create(
+        action=action,
+        context=context,
+        timestamp="auto",
+        sign=True
+    )
+    result = await execute(action, context)
+    await trail.append(event, result=result)
+    return result
+
+# Query & replay for debugging
+history = await trail.query(
+    action="transfer_funds",
+    after="2025-01-01",
+    verify_chain=True
+)`,
+    },
+    typescript: {
+      filename: "audit.ts",
+      code: `import { AuditTrail, Event } from "@kyberon/trailproof";
+
+const trail = new AuditTrail({
+  signingKey: "sk_...",
+  chain: true // cryptographic hash chain
+});
+
+const agentAction = trail.track(
+  async (action: string, context: object) => {
+    const event = Event.create({
+      action,
+      context,
+      timestamp: "auto",
+      sign: true
+    });
+    const result = await execute(action, context);
+    await trail.append(event, { result });
+    return result;
+  }
+);
+
+// Query & replay for debugging
+const history = await trail.query({
+  action: "transfer_funds",
+  after: "2025-01-01",
+  verifyChain: true
+});`,
+    },
+  },
+};
+
+/* ─────────────── Project Code Window ─────────────── */
+
+function ProjectCodeWindow({ projectId }: { projectId: ProjectId }) {
+  const [copied, setCopied] = useState(false);
+  const [lang, setLang] = useState<"python" | "typescript">("python");
+  const snippet = projectCodeSnippets[projectId][lang];
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(snippet.code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="code-block overflow-hidden rounded-xl">
+      <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5">
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => setLang("python")}
+            className={cn(
+              "rounded-md px-2.5 py-1 text-xs font-medium transition",
+              lang === "python"
+                ? "bg-zinc-800 text-white dark:bg-zinc-700"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            Python
+          </button>
+          <button
+            onClick={() => setLang("typescript")}
+            className={cn(
+              "rounded-md px-2.5 py-1 text-xs font-medium transition",
+              lang === "typescript"
+                ? "bg-zinc-800 text-white dark:bg-zinc-700"
+                : "text-zinc-500 hover:text-zinc-300"
+            )}
+          >
+            TypeScript
+          </button>
+          <span className="ml-2 text-xs text-zinc-600">{snippet.filename}</span>
+        </div>
+        <button
+          onClick={handleCopy}
+          className="flex items-center gap-1 rounded-md px-2 py-1 text-xs text-zinc-500 transition hover:text-zinc-300"
+        >
+          {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
+          {copied ? "Copied" : "Copy"}
+        </button>
+      </div>
+      <pre className="overflow-x-auto p-4 text-[13px] leading-relaxed">
+        <code className="text-zinc-300">
+          {snippet.code.split("\n").map((line, i) => (
+            <div key={i} className="flex">
+              <span className="mr-4 inline-block w-6 select-none text-right text-zinc-600">
+                {i + 1}
+              </span>
+              <span>{highlightLine(line)}</span>
+            </div>
+          ))}
+        </code>
+      </pre>
+    </div>
+  );
+}
+
+/* ─────────────── Projects ─────────────── */
 
 function ProjectsSection({
   activeProject,
@@ -479,161 +849,215 @@ function ProjectsSection({
   setActiveProject: (id: ProjectId) => void;
 }) {
   const selected = projects.find((p) => p.id === activeProject) ?? projects[0];
-  const selectedAccent =
-    selected.color === "green"
-      ? "text-emerald-500"
-      : selected.color === "cyan"
-        ? "text-sky-500"
-        : "text-violet-500";
+
+  const colorMap = {
+    green: { ring: "ring-emerald-500/30", text: "text-emerald-500", bg: "bg-emerald-500/10", border: "border-emerald-500/30" },
+    purple: { ring: "ring-violet-500/30", text: "text-violet-500", bg: "bg-violet-500/10", border: "border-violet-500/30" },
+    cyan: { ring: "ring-sky-500/30", text: "text-sky-500", bg: "bg-sky-500/10", border: "border-sky-500/30" },
+  };
 
   return (
-    <section id="projects" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <SectionHeading
-          badge="Projects"
-          title="Focused modules for agent reliability"
-          subtitle="Select a project to see the problem it solves and how it works in production stacks."
-        />
-
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {projects.map((project, i) => (
-            <motion.button
-              key={project.id}
-              type="button"
-              onClick={() => setActiveProject(project.id)}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
-              variants={fadeUp}
-              custom={i}
-              className={cn(
-                "glass-card group relative rounded-2xl p-6 text-left transition",
-                activeProject === project.id && project.color === "green" && "ring-1 ring-emerald-500/50",
-                activeProject === project.id && project.color === "purple" && "ring-1 ring-violet-500/50",
-                activeProject === project.id && project.color === "cyan" && "ring-1 ring-sky-500/50"
-              )}
-            >
-              <span
-                className={cn(
-                  "absolute right-4 top-4 rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white",
-                  project.status === "LIVE" ? "bg-blue-500" : "bg-emerald-500"
-                )}
-              >
-                {project.status}
-              </span>
-
-              <div className="flex items-center gap-3">
-                <div
-                  className={cn(
-                    "flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br",
-                    project.color === "purple" &&
-                      "from-violet-500/20 to-violet-600/5 text-violet-500 dark:text-violet-400",
-                    project.color === "green" &&
-                      "from-emerald-500/20 to-emerald-600/5 text-emerald-500 dark:text-emerald-400",
-                    project.color === "cyan" &&
-                      "from-sky-500/20 to-sky-600/5 text-sky-500 dark:text-sky-400"
-                  )}
-                >
-                  {project.logoSrc ? (
-                    <Image
-                      src={project.logoSrc}
-                      alt={`${project.name} logo`}
-                      width={16}
-                      height={16}
-                      className="h-4 w-4"
-                    />
-                  ) : (
-                    <project.icon className="h-4 w-4" />
-                  )}
-                </div>
-                <span className="text-sm font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                  {project.name}
-                </span>
-              </div>
-
-              <p
-                className={cn(
-                  "mt-3 text-sm font-medium italic",
-                  project.color === "purple" && "text-violet-600 dark:text-violet-400",
-                  project.color === "green" && "text-emerald-600 dark:text-emerald-400",
-                  project.color === "cyan" && "text-sky-600 dark:text-sky-400"
-                )}
-              >
-                {project.tagline}
-              </p>
-
-              <p className="mt-3 text-sm leading-relaxed text-slate-600 dark:text-slate-500">
-                {project.summary}
-              </p>
-
-              <div className="mt-4 flex flex-wrap gap-2">
-                {project.badges.map((badge) => (
-                  <span
-                    key={badge}
-                    className="inline-flex items-center rounded-full border border-slate-300/60 bg-white/70 px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-300"
-                  >
-                    {badge}
-                  </span>
-                ))}
-              </div>
-
-              <ArrowRight className="mt-5 h-4 w-4 text-slate-500 transition group-hover:translate-x-1 group-hover:text-blue-500" />
-            </motion.button>
-          ))}
-        </div>
-
+    <section id="projects" className="py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionLabel>Projects</SectionLabel>
         <AnimatePresence mode="wait">
           <motion.div
             key={selected.id}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
+            exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.25 }}
-            className="glass-card mt-8 rounded-2xl p-6"
           >
-            <div className="grid gap-8 lg:grid-cols-2">
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  Problem
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                  {selected.problem}
-                </p>
-              </div>
+            <h2 className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white">
+              {selected.name}
+            </h2>
+            <p className="mt-3 max-w-xl text-base text-zinc-500 dark:text-zinc-400">
+              {selected.summary}
+            </p>
+          </motion.div>
+        </AnimatePresence>
 
-              <div>
-                <h3 className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  How It Works
-                </h3>
-                <ul className="mt-3 space-y-2">
-                  {selected.howItWorks.map((step) => (
-                    <li
-                      key={step}
-                      className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-300"
+        {/* Two-column layout: cards left, code right */}
+        <div className="mt-12 grid gap-6 lg:grid-cols-2">
+          {/* Left: project cards stacked */}
+          <div className="space-y-3">
+            {projects.map((project, i) => {
+              const colors = colorMap[project.color];
+              const isActive = activeProject === project.id;
+
+              return (
+                <motion.button
+                  key={project.id}
+                  type="button"
+                  onClick={() => setActiveProject(project.id)}
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true }}
+                  variants={fadeUp}
+                  custom={i}
+                  className={cn(
+                    "card group relative w-full rounded-xl p-5 text-left transition-all",
+                    isActive && `ring-1 ${colors.ring}`
+                  )}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg", colors.bg)}>
+                        {project.logoSrc ? (
+                          <Image
+                            src={project.logoSrc}
+                            alt={`${project.name} logo`}
+                            width={14}
+                            height={14}
+                            className="h-3.5 w-3.5"
+                          />
+                        ) : (
+                          <project.icon className={cn("h-3.5 w-3.5", colors.text)} />
+                        )}
+                      </div>
+                      <span className="text-sm font-semibold text-zinc-900 dark:text-white">
+                        {project.name}
+                      </span>
+                    </div>
+                    <span
+                      className={cn(
+                        "rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                        project.status === "LIVE"
+                          ? "bg-blue-500/10 text-blue-500"
+                          : "bg-emerald-500/10 text-emerald-500"
+                      )}
                     >
-                      <CheckCircle2 className={cn("mt-0.5 h-4 w-4 shrink-0", selectedAccent)} />
-                      <span>{step}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+                      {project.status}
+                    </span>
+                  </div>
 
-            <div className="mt-5 flex flex-wrap gap-3">
-              <a
-                href={selected.docsHref}
-                className="inline-flex items-center gap-2 rounded-full border border-slate-400/25 bg-white/70 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-300 dark:hover:bg-white/[0.06]"
+                  <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+                    {project.tagline}
+                  </p>
+
+                  {/* Expanded info when active */}
+                  <AnimatePresence>
+                    {isActive && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-3 flex flex-wrap gap-1.5">
+                          {project.badges.map((badge) => (
+                            <span
+                              key={badge}
+                              className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-0.5 text-[11px] font-medium text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-500"
+                            >
+                              {badge}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="mt-3 flex gap-2">
+                          <a
+                            href={project.docsHref}
+                            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-xs font-medium text-zinc-600 transition hover:bg-zinc-50 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-800"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <BookOpen className="h-3 w-3" />
+                            Docs
+                          </a>
+                          <a
+                            href={project.repoHref}
+                            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Github className="h-3 w-3" />
+                            Repository
+                          </a>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
+              );
+            })}
+          </div>
+
+          {/* Right: animated code window */}
+          <div className="hidden lg:block">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selected.id}
+                initial={{ opacity: 0, x: 20, scale: 0.98 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -20, scale: 0.98 }}
+                transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="sticky top-20"
               >
-                <BookOpen className="h-3.5 w-3.5" />
-                Docs
-              </a>
-              <a
-                href={selected.repoHref}
-                className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 px-4 py-2 text-xs font-semibold text-white transition hover:brightness-110"
+                <ProjectCodeWindow projectId={selected.id} />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Mobile: code window below cards */}
+          <div className="lg:hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selected.id}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.25 }}
               >
-                <Github className="h-3.5 w-3.5" />
-                Repository
-              </a>
+                <ProjectCodeWindow projectId={selected.id} />
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Problem & How it Works — single card for selected project */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={`details-${selected.id}`}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="mt-12"
+          >
+            <div className="card rounded-xl p-8">
+              <div className="grid gap-8 lg:grid-cols-2">
+                {/* Left: Problem */}
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4">
+                    Problem
+                  </h3>
+                  <p className="text-base leading-relaxed text-zinc-300">
+                    {selected.problem}
+                  </p>
+                </div>
+
+                {/* Right: How it Works */}
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-400 mb-4">
+                    How it Works
+                  </h3>
+                  <ul className="space-y-3">
+                    {selected.howItWorks.map((step, i) => (
+                      <motion.li
+                        key={i}
+                        initial={{ opacity: 0, x: -8 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.1 + i * 0.1, duration: 0.3 }}
+                        className="flex items-start gap-3"
+                      >
+                        <CheckCircle2 className={cn("mt-0.5 h-4 w-4 shrink-0", colorMap[selected.color].text)} />
+                        <span className="text-sm leading-relaxed text-zinc-300">
+                          {step}
+                        </span>
+                      </motion.li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -642,50 +1066,100 @@ function ProjectsSection({
   );
 }
 
-function FailureModesSection() {
+/* ─────────────── How It Works / Failure Modes ─────────────── */
+
+function HowItWorksSection() {
   const items = [
     {
       title: "Unsafe autonomous actions",
-      desc: "Agents can call tools with real-world impact faster than teams can review. Verification should scale with risk.",
+      desc: "Agents call tools with real-world impact faster than teams can review. Verification should scale with risk.",
       icon: AlertTriangle,
+      iconColor: "text-amber-500",
+      iconBg: "bg-amber-500/10",
     },
     {
       title: "Compounding memory errors",
       desc: "Bad memory writes poison downstream steps. Reliability requires guardrails on both writes and retrieval.",
       icon: BrainCircuit,
+      iconColor: "text-violet-500",
+      iconBg: "bg-violet-500/10",
     },
     {
       title: "No operational accountability",
       desc: "Without auditability, debugging incidents and proving compliance becomes costly and slow.",
       icon: ClipboardCheck,
+      iconColor: "text-sky-500",
+      iconBg: "bg-sky-500/10",
     },
   ];
 
   return (
-    <section id="failure-modes" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <SectionHeading
-          badge="Failure Modes"
-          title="Designed around real production breakpoints"
-          subtitle="Kyberon prioritizes high-impact failure patterns that teams hit when agents move from demo to production."
-        />
+    <section id="how-it-works" className="py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionLabel>Why Kyberon</SectionLabel>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={stagger}
+        >
+          <motion.h2
+            variants={fadeUp}
+            custom={0}
+            className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white"
+          >
+            Designed around real
+            <br />
+            production breakpoints
+          </motion.h2>
+          <motion.p
+            variants={fadeUp}
+            custom={1}
+            className="mt-4 max-w-xl text-base text-zinc-500 dark:text-zinc-400"
+          >
+            Kyberon prioritizes high-impact failure patterns that teams hit when agents move from demo to production.
+          </motion.p>
+        </motion.div>
 
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
           {items.map((item, i) => (
             <motion.div
               key={item.title}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
+              viewport={{ once: true }}
               variants={fadeUp}
               custom={i}
-              className="glass-card rounded-2xl p-6"
+              className="card rounded-xl p-6"
             >
-              <div className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10 text-blue-500 dark:text-blue-400">
-                <item.icon className="h-5 w-5" />
+              <div className={cn("mb-4 inline-flex h-10 w-10 items-center justify-center rounded-lg", item.iconBg)}>
+                <item.icon className={cn("h-5 w-5", item.iconColor)} />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{item.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{item.desc}</p>
+              <h3 className="text-base font-semibold text-zinc-900 dark:text-white">{item.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">{item.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Feature highlights */}
+        <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            { icon: Lock, label: "Policy enforcement" },
+            { icon: Eye, label: "Human-in-the-loop" },
+            { icon: Zap, label: "Framework agnostic" },
+            { icon: Terminal, label: "Self-hostable" },
+          ].map((feat, i) => (
+            <motion.div
+              key={feat.label}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={fadeUp}
+              custom={i}
+              className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/30"
+            >
+              <feat.icon className="h-4 w-4 text-blue-500" />
+              <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">{feat.label}</span>
             </motion.div>
           ))}
         </div>
@@ -694,36 +1168,57 @@ function FailureModesSection() {
   );
 }
 
+/* ─────────────── Integrations ─────────────── */
+
 function IntegrationsSection() {
   return (
-    <section id="integrations" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <SectionHeading
-          badge="Integrations"
-          title="Plugs into your existing agent stack"
-          subtitle="Use Kyberon with the frameworks and workflow tools your team already runs."
-        />
+    <section id="integrations" className="py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <SectionLabel>Integrations</SectionLabel>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={stagger}
+        >
+          <motion.h2
+            variants={fadeUp}
+            custom={0}
+            className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white"
+          >
+            Plugs into your
+            <br />
+            existing stack
+          </motion.h2>
+          <motion.p
+            variants={fadeUp}
+            custom={1}
+            className="mt-4 max-w-xl text-base text-zinc-500 dark:text-zinc-400"
+          >
+            Use Kyberon with the frameworks and workflow tools your team already runs.
+          </motion.p>
+        </motion.div>
 
-        <div className="space-y-5">
+        <div className="mt-12 space-y-4">
           {integrationGroups.map((group, i) => (
             <motion.div
               key={group.label}
               initial="hidden"
               whileInView="visible"
-              viewport={{ once: true, margin: "-80px" }}
+              viewport={{ once: true }}
               variants={fadeUp}
               custom={i}
-              className="glass-card rounded-2xl p-5"
+              className="card rounded-xl p-5"
             >
-              <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                <PlugZap className="h-4 w-4" />
+              <div className="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-zinc-500">
+                <PlugZap className="h-3.5 w-3.5" />
                 {group.label}
               </div>
               <div className="flex flex-wrap gap-2">
                 {group.items.map((item) => (
                   <span
                     key={item}
-                    className="integration-chip rounded-full border border-slate-300/60 px-3 py-1.5 text-xs font-medium text-slate-700 dark:border-white/10 dark:text-slate-300"
+                    className="rounded-md border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-400"
                   >
                     {item}
                   </span>
@@ -737,42 +1232,51 @@ function IntegrationsSection() {
   );
 }
 
+/* ─────────────── FAQ ─────────────── */
+
 function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="py-24 sm:py-32">
-      <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-        <SectionHeading
-          badge="FAQ"
-          title="Frequently asked questions"
-          subtitle="The basics teams ask before adopting Kyberon modules in production."
-        />
+    <section id="faq" className="py-24">
+      <div className="mx-auto max-w-2xl px-4 sm:px-6">
+        <SectionLabel>FAQ</SectionLabel>
+        <motion.h2
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeUp}
+          custom={0}
+          className="text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white"
+        >
+          Frequently asked
+          <br />
+          questions
+        </motion.h2>
 
         <motion.div
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
+          viewport={{ once: true }}
           variants={stagger}
-          className="space-y-4"
+          className="mt-10 space-y-2"
         >
           {faqs.map((faq, i) => (
             <motion.div
               key={faq.q}
               variants={fadeUp}
               custom={i}
-              className="glass-card overflow-hidden rounded-xl"
+              className="card overflow-hidden rounded-lg"
             >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="flex w-full items-center justify-between px-6 py-5 text-left text-sm font-medium text-slate-800 transition hover:text-blue-600 dark:text-slate-200 dark:hover:text-blue-300"
-                aria-expanded={openIndex === i}
+                className="flex w-full items-center justify-between px-5 py-4 text-left text-sm font-medium text-zinc-800 transition hover:text-zinc-900 dark:text-zinc-200 dark:hover:text-white"
               >
                 {faq.q}
                 <ChevronDown
                   className={cn(
-                    "h-4 w-4 shrink-0 text-slate-500 transition-transform duration-300",
-                    openIndex === i && "rotate-180 text-blue-500"
+                    "h-4 w-4 shrink-0 text-zinc-400 transition-transform duration-200",
+                    openIndex === i && "rotate-180"
                   )}
                 />
               </button>
@@ -782,10 +1286,10 @@ function FAQSection() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25 }}
+                    transition={{ duration: 0.2 }}
                     className="overflow-hidden"
                   >
-                    <p className="px-6 pb-5 text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                    <p className="px-5 pb-4 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
                       {faq.a}
                     </p>
                   </motion.div>
@@ -799,59 +1303,59 @@ function FAQSection() {
   );
 }
 
+/* ─────────────── CTA ─────────────── */
+
 function CTABanner() {
   return (
     <section className="py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={stagger}
-          className="relative overflow-hidden rounded-3xl border border-slate-300/50 bg-gradient-to-br from-sky-300/20 via-cyan-200/15 to-transparent p-12 text-center dark:border-white/[0.08] dark:from-blue-500/10 dark:via-cyan-500/5 sm:p-16"
+          className="relative overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-50 p-12 text-center dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-16"
         >
           <div
-            className="pointer-events-none absolute -left-20 -top-20 h-60 w-60 rounded-full bg-blue-500/10 blur-3xl"
-            aria-hidden="true"
-          />
-          <div
-            className="pointer-events-none absolute -bottom-20 -right-20 h-60 w-60 rounded-full bg-cyan-500/10 blur-3xl"
+            className="pointer-events-none absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-violet-500/5"
             aria-hidden="true"
           />
 
           <motion.h2
             variants={fadeUp}
             custom={0}
-            className="relative text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl lg:text-5xl dark:text-white"
+            className="relative text-3xl font-bold tracking-tight text-zinc-900 sm:text-4xl dark:text-white"
           >
-            Build trusted agents in the open
+            Build trusted agents
+            <br />
+            in the open
           </motion.h2>
           <motion.p
             variants={fadeUp}
             custom={1}
-            className="relative mx-auto mt-4 max-w-xl text-slate-600 dark:text-slate-400 sm:text-lg"
+            className="relative mx-auto mt-4 max-w-lg text-zinc-500 dark:text-zinc-400"
           >
-            Adopt Attesta, MemProof, or TrailProof today and help shape the open
+            Adopt Attesta, MemProof, or TrailProof today and help shape the
             reliability layer for autonomous AI systems.
           </motion.p>
           <motion.div
             variants={fadeUp}
             custom={2}
-            className="relative mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
+            className="relative mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
           >
             <a
               href="https://github.com/orgs/KyberonAi/repositories"
               target="_blank"
               rel="noopener noreferrer"
-              className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-cyan-500 px-8 py-3.5 text-sm font-semibold text-white transition hover:brightness-110"
+              className="group inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition hover:bg-blue-700"
             >
               <Github className="h-4 w-4" />
               Star on GitHub
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-0.5" />
             </a>
             <a
               href="#projects"
-              className="inline-flex items-center gap-2 rounded-full border border-slate-400/30 bg-white/70 px-8 py-3.5 text-sm font-semibold text-slate-700 backdrop-blur transition hover:bg-white dark:border-white/10 dark:bg-white/[0.03] dark:text-slate-300 dark:hover:bg-white/[0.06]"
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 bg-white px-6 py-2.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:bg-zinc-800"
             >
               View Projects
             </a>
@@ -862,39 +1366,44 @@ function CTABanner() {
   );
 }
 
+/* ─────────────── Footer ─────────────── */
+
 function Footer() {
   const cols = [
     {
       title: "Projects",
-      links: ["Attesta", "MemProof", "TrailProof"],
+      links: [
+        { label: "Attesta", href: "https://attesta.kyberon.dev" },
+        { label: "MemProof", href: "https://memproof.kyberon.dev" },
+        { label: "TrailProof", href: "https://trailproof.kyberon.dev" },
+      ],
     },
     {
       title: "Developers",
-      links: ["Documentation", "API Reference", "Examples", "Roadmap"],
+      links: [
+        { label: "Documentation", href: "#" },
+        { label: "API Reference", href: "#" },
+        { label: "Examples", href: "#" },
+      ],
     },
     {
       title: "Community",
-      links: ["GitHub Discussions", "Contributing", "Blog"],
-    },
-    {
-      title: "About",
-      links: ["Mission", "Contact"],
+      links: [
+        { label: "GitHub", href: "https://github.com/orgs/KyberonAi/repositories" },
+        { label: "Contributing", href: "#" },
+        { label: "Blog", href: "#" },
+      ],
     },
   ];
 
   return (
-    <footer className="border-t border-slate-300/40 py-16 dark:border-white/[0.06]" role="contentinfo">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5">
-          <div className="lg:col-span-1">
-            <a href="#" className="flex items-center gap-2 text-base font-bold">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="h-4 w-4 text-white"
-                  aria-hidden="true"
-                >
+    <footer className="border-t border-zinc-200 py-12 dark:border-zinc-800/50">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <a href="#" className="flex items-center gap-2">
+              <div className="flex h-6 w-6 items-center justify-center rounded-md bg-blue-600">
+                <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 text-white" aria-hidden="true">
                   <path
                     d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"
                     stroke="currentColor"
@@ -904,29 +1413,29 @@ function Footer() {
                   />
                 </svg>
               </div>
-              <span className="text-slate-900 dark:text-white">
-                Kyberon<span className="text-blue-500 dark:text-blue-400">AI</span>
-              </span>
+              <span className="text-sm font-semibold text-zinc-900 dark:text-white">KyberonAI</span>
             </a>
-            <p className="mt-4 text-sm text-slate-600 dark:text-slate-500">
-              Open-source reliability infrastructure for AI agents.
+            <p className="mt-3 text-xs text-zinc-500">
+              Open-source reliability infrastructure
+              <br />
+              for AI agents.
             </p>
-            <p className="mt-2 text-xs text-slate-500 dark:text-slate-600">MIT Licensed</p>
+            <p className="mt-2 text-xs text-zinc-400 dark:text-zinc-600">MIT Licensed</p>
           </div>
 
           {cols.map((col) => (
             <div key={col.title}>
-              <h4 className="text-sm font-semibold uppercase tracking-wider text-slate-800 dark:text-slate-300">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-500">
                 {col.title}
               </h4>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-3 space-y-2">
                 {col.links.map((link) => (
-                  <li key={link}>
+                  <li key={link.label}>
                     <a
-                      href="#"
-                      className="text-sm text-slate-600 transition hover:text-slate-900 dark:text-slate-500 dark:hover:text-slate-300"
+                      href={link.href}
+                      className="text-sm text-zinc-500 transition hover:text-zinc-900 dark:text-zinc-500 dark:hover:text-zinc-300"
                     >
-                      {link}
+                      {link.label}
                     </a>
                   </li>
                 ))}
@@ -935,16 +1444,16 @@ function Footer() {
           ))}
         </div>
 
-        <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-slate-300/40 pt-8 dark:border-white/[0.06] sm:flex-row">
-          <p className="text-xs text-slate-500 dark:text-slate-600">
+        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-zinc-200 pt-8 dark:border-zinc-800/50 sm:flex-row">
+          <p className="text-xs text-zinc-400 dark:text-zinc-600">
             &copy; {new Date().getFullYear()} KyberonAI. Open source under MIT.
           </p>
-          <div className="flex gap-6">
+          <div className="flex gap-5">
             {["GitHub", "Discord", "X"].map((s) => (
               <a
                 key={s}
                 href="#"
-                className="text-xs text-slate-500 transition hover:text-slate-700 dark:text-slate-600 dark:hover:text-slate-400"
+                className="text-xs text-zinc-400 transition hover:text-zinc-600 dark:text-zinc-600 dark:hover:text-zinc-400"
               >
                 {s}
               </a>
@@ -955,6 +1464,8 @@ function Footer() {
     </footer>
   );
 }
+
+/* ─────────────── Main ─────────────── */
 
 function applyTheme(theme: Theme) {
   const root = document.documentElement;
@@ -972,9 +1483,7 @@ export default function Home() {
       setTheme(stored);
       return;
     }
-
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    setTheme(prefersDark ? "dark" : "light");
+    setTheme("dark");
   }, []);
 
   useEffect(() => {
@@ -990,13 +1499,15 @@ export default function Home() {
       />
       <main>
         <HeroSection />
-        <div className="section-glow-line" />
+        <div className="section-divider" />
+        <StatsSection />
+        <div className="section-divider" />
         <ProjectsSection activeProject={activeProject} setActiveProject={setActiveProject} />
-        <div className="section-glow-line" />
-        <FailureModesSection />
-        <div className="section-glow-line" />
+        <div className="section-divider" />
+        <HowItWorksSection />
+        <div className="section-divider" />
         <IntegrationsSection />
-        <div className="section-glow-line" />
+        <div className="section-divider" />
         <FAQSection />
         <CTABanner />
       </main>

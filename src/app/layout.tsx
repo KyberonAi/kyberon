@@ -52,10 +52,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-[family-name:var(--font-geist-sans)] antialiased`}
       >
-        <div className="aurora-bg" aria-hidden="true">
-          <div className="aurora-orb-1" />
-        </div>
-        <div className="grid-bg" aria-hidden="true" />
+        <div className="dot-grid" aria-hidden="true" />
+        <div className="top-glow" aria-hidden="true" />
         <div className="relative z-10">{children}</div>
       </body>
     </html>
