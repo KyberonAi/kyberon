@@ -829,22 +829,24 @@ function ProjectsSection({
           {/* Left column: title, description, project cards */}
           <div>
             <SectionLabel>Projects</SectionLabel>
-            <AnimatePresence mode="popLayout">
-              <motion.div
-                key={selected.id}
-                initial={{ opacity: 0, y: 4 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -4 }}
-                transition={{ duration: 0.15, ease: "easeOut" }}
-              >
-                <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-                  {selected.name}
-                </h2>
-                <p className="mt-3 text-base text-zinc-400">
-                  {selected.summary}
-                </p>
-              </motion.div>
-            </AnimatePresence>
+            <div className="relative">
+              <AnimatePresence mode="sync">
+                <motion.div
+                  key={selected.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0, position: "absolute", top: 0, left: 0, right: 0 }}
+                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                >
+                  <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                    {selected.name}
+                  </h2>
+                  <p className="mt-3 text-base text-zinc-400">
+                    {selected.summary}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
+            </div>
 
             <div className="mt-8 space-y-3">
               {projects.map((project, i) => {
@@ -908,7 +910,7 @@ function ProjectsSection({
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.15, ease: "easeOut" }}
+                          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                           className="overflow-hidden"
                         >
                           <div className="mt-3 flex flex-wrap gap-1.5">
@@ -950,14 +952,14 @@ function ProjectsSection({
 
           {/* Right column: code window — starts at top, aligned with "PROJECTS" title */}
           <div className="hidden lg:block">
-            <div className="sticky top-20">
-              <AnimatePresence mode="popLayout">
+            <div className="sticky top-20 relative">
+              <AnimatePresence mode="sync">
                 <motion.div
                   key={selected.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  exit={{ opacity: 0, position: "absolute", top: 0, left: 0, right: 0 }}
+                  transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
                 >
                   <ProjectCodeWindow projectId={selected.id} />
                 </motion.div>
@@ -966,14 +968,14 @@ function ProjectsSection({
           </div>
 
           {/* Mobile: code window below cards */}
-          <div className="lg:hidden">
-            <AnimatePresence mode="popLayout">
+          <div className="lg:hidden relative">
+            <AnimatePresence mode="sync">
               <motion.div
                 key={selected.id}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15, ease: "easeOut" }}
+                exit={{ opacity: 0, position: "absolute", top: 0, left: 0, right: 0 }}
+                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
               >
                 <ProjectCodeWindow projectId={selected.id} />
               </motion.div>
@@ -982,14 +984,14 @@ function ProjectsSection({
         </div>
 
         {/* Problem & How it Works — single card for selected project */}
-        <AnimatePresence mode="popLayout">
+        <div className="relative mt-12">
+        <AnimatePresence mode="sync">
           <motion.div
             key={`details-${selected.id}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15, ease: "easeOut" }}
-            className="mt-12"
+            exit={{ opacity: 0, position: "absolute", top: 0, left: 0, right: 0 }}
+            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
           >
             <div className="card rounded-xl p-8">
               <div className="grid gap-8 lg:grid-cols-2">
@@ -1012,9 +1014,9 @@ function ProjectsSection({
                     {selected.howItWorks.map((step, i) => (
                       <motion.li
                         key={i}
-                        initial={{ opacity: 0, x: -4 }}
+                        initial={{ opacity: 0, x: -6 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: i * 0.05, duration: 0.15 }}
+                        transition={{ delay: i * 0.08, duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                         className="flex items-start gap-3"
                       >
                         <CheckCircle2 className={cn("mt-0.5 h-4 w-4 shrink-0", colorMap[selected.color].text)} />
@@ -1029,6 +1031,7 @@ function ProjectsSection({
             </div>
           </motion.div>
         </AnimatePresence>
+        </div>
       </div>
     </section>
   );
