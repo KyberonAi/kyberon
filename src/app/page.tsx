@@ -829,13 +829,13 @@ function ProjectsSection({
           {/* Left column: title, description, project cards */}
           <div>
             <SectionLabel>Projects</SectionLabel>
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="popLayout">
               <motion.div
                 key={selected.id}
-                initial={{ opacity: 0, y: 8 }}
+                initial={{ opacity: 0, y: 4 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25 }}
+                exit={{ opacity: 0, y: -4 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
               >
                 <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
                   {selected.name}
@@ -902,13 +902,13 @@ function ProjectsSection({
                     </p>
 
                     {/* Expanded info when active */}
-                    <AnimatePresence>
+                    <AnimatePresence initial={false}>
                       {isActive && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
                           animate={{ height: "auto", opacity: 1 }}
                           exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.25 }}
+                          transition={{ duration: 0.15, ease: "easeOut" }}
                           className="overflow-hidden"
                         >
                           <div className="mt-3 flex flex-wrap gap-1.5">
@@ -950,29 +950,30 @@ function ProjectsSection({
 
           {/* Right column: code window — starts at top, aligned with "PROJECTS" title */}
           <div className="hidden lg:block">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={selected.id}
-                initial={{ opacity: 0, x: 20, scale: 0.98 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -20, scale: 0.98 }}
-                transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="sticky top-20"
-              >
-                <ProjectCodeWindow projectId={selected.id} />
-              </motion.div>
-            </AnimatePresence>
+            <div className="sticky top-20">
+              <AnimatePresence mode="popLayout">
+                <motion.div
+                  key={selected.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                >
+                  <ProjectCodeWindow projectId={selected.id} />
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* Mobile: code window below cards */}
           <div className="lg:hidden">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="popLayout">
               <motion.div
                 key={selected.id}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.25 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15, ease: "easeOut" }}
               >
                 <ProjectCodeWindow projectId={selected.id} />
               </motion.div>
@@ -981,13 +982,13 @@ function ProjectsSection({
         </div>
 
         {/* Problem & How it Works — single card for selected project */}
-        <AnimatePresence mode="wait">
+        <AnimatePresence mode="popLayout">
           <motion.div
             key={`details-${selected.id}`}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15, ease: "easeOut" }}
             className="mt-12"
           >
             <div className="card rounded-xl p-8">
@@ -1011,9 +1012,9 @@ function ProjectsSection({
                     {selected.howItWorks.map((step, i) => (
                       <motion.li
                         key={i}
-                        initial={{ opacity: 0, x: -8 }}
+                        initial={{ opacity: 0, x: -4 }}
                         animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 + i * 0.1, duration: 0.3 }}
+                        transition={{ delay: i * 0.05, duration: 0.15 }}
                         className="flex items-start gap-3"
                       >
                         <CheckCircle2 className={cn("mt-0.5 h-4 w-4 shrink-0", colorMap[selected.color].text)} />
