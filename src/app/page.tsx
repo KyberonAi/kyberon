@@ -829,14 +829,14 @@ function ProjectsSection({
           {/* Left column: title, description, project cards */}
           <div>
             <SectionLabel>Projects</SectionLabel>
-            <div className="relative">
-              <AnimatePresence mode="sync">
+            <div className="grid [&>*]:col-start-1 [&>*]:row-start-1">
+              <AnimatePresence>
                 <motion.div
                   key={selected.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 0, position: "absolute", top: 0, left: 0, right: 0 }}
-                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
                 >
                   <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
                     {selected.name}
@@ -952,46 +952,50 @@ function ProjectsSection({
 
           {/* Right column: code window — starts at top, aligned with "PROJECTS" title */}
           <div className="hidden lg:block">
-            <div className="sticky top-20 relative">
-              <AnimatePresence mode="sync">
+            <div className="sticky top-20">
+              <div className="grid [&>*]:col-start-1 [&>*]:row-start-1">
+                <AnimatePresence>
+                  <motion.div
+                    key={selected.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+                  >
+                    <ProjectCodeWindow projectId={selected.id} />
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile: code window below cards */}
+          <div className="lg:hidden">
+            <div className="grid [&>*]:col-start-1 [&>*]:row-start-1">
+              <AnimatePresence>
                 <motion.div
                   key={selected.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  exit={{ opacity: 0, position: "absolute", top: 0, left: 0, right: 0 }}
-                  transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
                 >
                   <ProjectCodeWindow projectId={selected.id} />
                 </motion.div>
               </AnimatePresence>
             </div>
           </div>
-
-          {/* Mobile: code window below cards */}
-          <div className="lg:hidden relative">
-            <AnimatePresence mode="sync">
-              <motion.div
-                key={selected.id}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0, position: "absolute", top: 0, left: 0, right: 0 }}
-                transition={{ duration: 0.4, ease: [0.4, 0, 0.2, 1] }}
-              >
-                <ProjectCodeWindow projectId={selected.id} />
-              </motion.div>
-            </AnimatePresence>
-          </div>
         </div>
 
         {/* Problem & How it Works — single card for selected project */}
-        <div className="relative mt-12">
-        <AnimatePresence mode="sync">
+        <div className="mt-12 grid [&>*]:col-start-1 [&>*]:row-start-1">
+        <AnimatePresence>
           <motion.div
             key={`details-${selected.id}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            exit={{ opacity: 0, position: "absolute", top: 0, left: 0, right: 0 }}
-            transition={{ duration: 0.35, ease: [0.4, 0, 0.2, 1] }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
           >
             <div className="card rounded-xl p-8">
               <div className="grid gap-8 lg:grid-cols-2">
