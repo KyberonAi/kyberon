@@ -824,129 +824,131 @@ function ProjectsSection({
   return (
     <section id="projects" className="py-24">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <SectionLabel>Projects</SectionLabel>
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={selected.id}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }}
-          >
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              {selected.name}
-            </h2>
-            <p className="mt-3 max-w-xl text-base text-zinc-400">
-              {selected.summary}
-            </p>
-          </motion.div>
-        </AnimatePresence>
+        {/* Two-column layout: title+cards left, code right — aligned from top */}
+        <div className="grid items-start gap-8 lg:grid-cols-2">
+          {/* Left column: title, description, project cards */}
+          <div>
+            <SectionLabel>Projects</SectionLabel>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={selected.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.25 }}
+              >
+                <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+                  {selected.name}
+                </h2>
+                <p className="mt-3 text-base text-zinc-400">
+                  {selected.summary}
+                </p>
+              </motion.div>
+            </AnimatePresence>
 
-        {/* Two-column layout: cards left, code right */}
-        <div className="mt-12 grid items-start gap-6 lg:grid-cols-2">
-          {/* Left: project cards stacked */}
-          <div className="space-y-3">
-            {projects.map((project, i) => {
-              const colors = colorMap[project.color];
-              const isActive = activeProject === project.id;
+            <div className="mt-8 space-y-3">
+              {projects.map((project, i) => {
+                const colors = colorMap[project.color];
+                const isActive = activeProject === project.id;
 
-              return (
-                <motion.button
-                  key={project.id}
-                  type="button"
-                  onClick={() => setActiveProject(project.id)}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-                  variants={fadeUp}
-                  custom={i}
-                  className={cn(
-                    "card group relative w-full rounded-xl p-5 text-left transition-all",
-                    isActive && `ring-1 ${colors.ring}`
-                  )}
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg", colors.bg)}>
-                        {project.logoSrc ? (
-                          <Image
-                            src={project.logoSrc}
-                            alt={`${project.name} logo`}
-                            width={14}
-                            height={14}
-                            className="h-3.5 w-3.5"
-                          />
-                        ) : (
-                          <project.icon className={cn("h-3.5 w-3.5", colors.text)} />
-                        )}
+                return (
+                  <motion.button
+                    key={project.id}
+                    type="button"
+                    onClick={() => setActiveProject(project.id)}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true }}
+                    variants={fadeUp}
+                    custom={i}
+                    className={cn(
+                      "card group relative w-full rounded-xl p-5 text-left transition-all",
+                      isActive && `ring-1 ${colors.ring}`
+                    )}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={cn("flex h-8 w-8 items-center justify-center rounded-lg", colors.bg)}>
+                          {project.logoSrc ? (
+                            <Image
+                              src={project.logoSrc}
+                              alt={`${project.name} logo`}
+                              width={14}
+                              height={14}
+                              className="h-3.5 w-3.5"
+                            />
+                          ) : (
+                            <project.icon className={cn("h-3.5 w-3.5", colors.text)} />
+                          )}
+                        </div>
+                        <span className="text-sm font-semibold text-white">
+                          {project.name}
+                        </span>
                       </div>
-                      <span className="text-sm font-semibold text-white">
-                        {project.name}
+                      <span
+                        className={cn(
+                          "rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
+                          project.status === "LIVE"
+                            ? "bg-blue-500/10 text-blue-500"
+                            : "bg-emerald-500/10 text-emerald-500"
+                        )}
+                      >
+                        {project.status}
                       </span>
                     </div>
-                    <span
-                      className={cn(
-                        "rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider",
-                        project.status === "LIVE"
-                          ? "bg-blue-500/10 text-blue-500"
-                          : "bg-emerald-500/10 text-emerald-500"
-                      )}
-                    >
-                      {project.status}
-                    </span>
-                  </div>
 
-                  <p className="mt-2 text-sm leading-relaxed text-zinc-400">
-                    {project.tagline}
-                  </p>
+                    <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+                      {project.tagline}
+                    </p>
 
-                  {/* Expanded info when active */}
-                  <AnimatePresence>
-                    {isActive && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="mt-3 flex flex-wrap gap-1.5">
-                          {project.badges.map((badge) => (
-                            <span
-                              key={badge}
-                              className="rounded-md border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[11px] font-medium text-zinc-500"
+                    {/* Expanded info when active */}
+                    <AnimatePresence>
+                      {isActive && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="overflow-hidden"
+                        >
+                          <div className="mt-3 flex flex-wrap gap-1.5">
+                            {project.badges.map((badge) => (
+                              <span
+                                key={badge}
+                                className="rounded-md border border-zinc-800 bg-zinc-900/50 px-2 py-0.5 text-[11px] font-medium text-zinc-500"
+                              >
+                                {badge}
+                              </span>
+                            ))}
+                          </div>
+                          <div className="mt-3 flex gap-2">
+                            <a
+                              href={project.docsHref}
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-zinc-800"
+                              onClick={(e) => e.stopPropagation()}
                             >
-                              {badge}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="mt-3 flex gap-2">
-                          <a
-                            href={project.docsHref}
-                            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-400 transition hover:bg-zinc-800"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <BookOpen className="h-3 w-3" />
-                            Docs
-                          </a>
-                          <a
-                            href={project.repoHref}
-                            className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <Github className="h-3 w-3" />
-                            Repository
-                          </a>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.button>
-              );
-            })}
+                              <BookOpen className="h-3 w-3" />
+                              Docs
+                            </a>
+                            <a
+                              href={project.repoHref}
+                              className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Github className="h-3 w-3" />
+                              Repository
+                            </a>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Right: animated code window */}
+          {/* Right column: code window — starts at top, aligned with "PROJECTS" title */}
           <div className="hidden lg:block">
             <AnimatePresence mode="wait">
               <motion.div
