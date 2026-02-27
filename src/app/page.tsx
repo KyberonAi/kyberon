@@ -315,7 +315,7 @@ function HeroSection() {
         >
           Open source software
           <br />
-          <span className="text-zinc-500">for AI agents</span>
+          <span className="text-zinc-500">for safe AI agents</span>
         </motion.h1>
 
         <motion.p
@@ -852,9 +852,9 @@ function ProjectsSection({
                 const isActive = activeProject === project.id;
 
                 return (
-                  <motion.button
+                  <motion.div
                     key={project.id}
-                    type="button"
+                    onMouseEnter={() => setActiveProject(project.id)}
                     onClick={() => setActiveProject(project.id)}
                     initial="hidden"
                     whileInView="visible"
@@ -862,7 +862,7 @@ function ProjectsSection({
                     variants={fadeUp}
                     custom={i}
                     className={cn(
-                      "card group relative w-full rounded-xl p-5 text-left transition-all",
+                      "card group relative w-full cursor-pointer rounded-xl p-5 text-left transition-all",
                       isActive && `ring-1 ${colors.ring}`
                     )}
                   >
@@ -942,7 +942,7 @@ function ProjectsSection({
                         </motion.div>
                       )}
                     </AnimatePresence>
-                  </motion.button>
+                  </motion.div>
                 );
               })}
             </div>
